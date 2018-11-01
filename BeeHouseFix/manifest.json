@@ -6,5 +6,5 @@
    "UniqueID": "kirbylink.beehousefix",
    "EntryDll": "beehousefix.dll",
    "MinimumApiVersion": "2.0",
-   "UpdateKeys": []
+   "UpdateKeys": ["Nexus:3013"]
 }
