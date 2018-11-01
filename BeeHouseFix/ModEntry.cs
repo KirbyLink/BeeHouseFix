@@ -29,7 +29,6 @@ namespace BeeHouseFix
 
     public static class FixBeeHouses
     {
-        /* Check if Event.isFestival is true before going into exitEven() */
         static bool Prefix(GameLocation location, Vector2 startTileLocation, ref Crop __result)
         {
             
