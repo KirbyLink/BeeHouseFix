@@ -34,24 +34,27 @@ namespace FestivalEndTimeTweak
     public static class FixBeeHouses
     {
         /* Check if Event.isFestival is true before going into exitEven() */
-        static bool Prefix(GameLocation location, Vector2 startTileLocation, Crop __result)
+        static bool Prefix(GameLocation location, Vector2 startTileLocation, ref Crop __result)
         {
             
-            Queue<Vector2> vector2Queue = new Queue<Vector2>();
-            HashSet<Vector2> vector2Set = new HashSet<Vector2>();
+            Queue<Vector2> flowersToCheck = new Queue<Vector2>();
+            HashSet<Vector2> checkedFlowers = new HashSet<Vector2>();
+            Crop poppy, summerSpangle, blueJazz, tulip;
+            poppy = summerSpangle = blueJazz = tulip = null;
             var terrainFeatures = location.terrainFeatures;
 
-            vector2Queue.Enqueue(startTileLocation);
-            for (int index1 = 0; index1 <= 150 && vector2Queue.Count > 0; ++index1)
+            flowersToCheck.Enqueue(startTileLocation);
+
+            while (flowersToCheck.Count > 0)
             {
-                Vector2 index2 = vector2Queue.Dequeue();
-                bool containsHoeDirt = terrainFeatures.ContainsKey(index2) && terrainFeatures[index2] is HoeDirt;
+                Vector2 tile = flowersToCheck.Dequeue();
+                bool containsHoeDirt = terrainFeatures.ContainsKey(tile) && terrainFeatures[tile] is HoeDirt;
                 if (!containsHoeDirt)
                 {
                     goto CheckAdjacent;
                 }
 
-                HoeDirt dirt = terrainFeatures[index2] as HoeDirt;
+                HoeDirt dirt = terrainFeatures[tile] as HoeDirt;
                 bool isFlower = dirt.crop != null && dirt.crop.programColored.Value;
                 if (!isFlower)
                 {
@@ -61,20 +64,41 @@ namespace FestivalEndTimeTweak
                 bool isGrownAndNotDead = dirt.crop.currentPhase.Value >= dirt.crop.phaseDays.Count - 1 && !dirt.crop.dead.Value;
                 if (isGrownAndNotDead)
                 {
-                    __result = dirt.crop;
-                    return false;
+                    switch (dirt.crop.indexOfHarvest.Value)
+                    {
+                        case 376:
+                            poppy = dirt.crop;
+                            break;
+                        case 591:
+                            tulip = dirt.crop;
+                            break;
+                        case 593:
+                            summerSpangle = dirt.crop;
+                            break;
+                        case 595: //Found most expensive flower
+                            __result = dirt.crop;
+                            return false;
+                        case 597:
+                            blueJazz = dirt.crop;
+                            break;
+                    }
                 }
 
-                CheckAdjacent:
-                foreach (Vector2 adjacentTileLocation in Utility.getAdjacentTileLocations(index2))
+            CheckAdjacent:
+                if (checkedFlowers.Count < 59) //At max tiles, stop queing
                 {
-                    if (!vector2Set.Contains(adjacentTileLocation))
-                        vector2Queue.Enqueue(adjacentTileLocation);
+                    foreach (Vector2 adjacentTileLocation in Utility.getAdjacentTileLocations(tile))
+                    {
+                        if (!checkedFlowers.Contains(adjacentTileLocation) && !flowersToCheck.Contains(adjacentTileLocation))
+                        {
+                            flowersToCheck.Enqueue(adjacentTileLocation);
+                        }
+                    }
+                    checkedFlowers.Add(tile);
                 }
-                vector2Set.Add(index2);
             }
 
-            __result = (Crop)null;
+            __result = poppy ?? summerSpangle ?? blueJazz ?? tulip;
             return false;
             
         }
