@@ -1,15 +1,11 @@
 ﻿using Harmony;
-using System;
 using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
-using System.Reflection.Emit;
 using Microsoft.Xna.Framework;
 using StardewValley.TerrainFeatures;
 
-namespace FestivalEndTimeTweak
+namespace BeeHouseFix
 {
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
