@@ -1,5 +1,5 @@
 ﻿{
-   "Name": "BeeHouseFix",
+   "Name": "Bee House Flower Range Fix",
    "Author": "KirbyLink",
    "Version": "1.1.0",
    "Description": "Fixes bug preventing top/bottom right tiles of bee house radius to not be checked for flowers.",
