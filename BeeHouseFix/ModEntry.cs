@@ -1,13 +1,13 @@
-﻿using Harmony;
+﻿using System.Collections.Generic;
+using Harmony;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using StardewValley.TerrainFeatures;
 
 namespace BeeHouseFix
 {
-    /// <summary>The mod entry point.</summary>
+    /// <summary>The mod entry class.</summary>
     public class ModEntry : Mod
     {
         /*********
@@ -19,19 +19,20 @@ namespace BeeHouseFix
         {
             //Harmony patcher
             //https://github.com/kirbylink/FestivalEndTimeTweak.git
-            var harmony = HarmonyInstance.Create("com.github.kirbylink.beehousefix");
-            var original = typeof(Utility).GetMethod("findCloseFlower");
-            var prefix = helper.Reflection.GetMethod(typeof(FixBeeHouses), "Prefix").MethodInfo;
-            harmony.Patch(original, new HarmonyMethod(prefix), null);
+            var harmony = HarmonyInstance.Create(this.ModManifest.UniqueID);
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Utility), nameof(Utility.findCloseFlower)),
+                prefix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.Prefix))
+            );
 
         }
-    }
 
-    public static class FixBeeHouses
-    {
-        static bool Prefix(GameLocation location, Vector2 startTileLocation, ref Crop __result)
+
+        /*********
+        ** Private methods
+        *********/
+        private static bool Prefix(GameLocation location, Vector2 startTileLocation, ref Crop __result)
         {
-            
             Queue<Vector2> flowersToCheck = new Queue<Vector2>();
             HashSet<Vector2> checkedFlowers = new HashSet<Vector2>();
             Crop poppy, summerSpangle, blueJazz, tulip;
@@ -95,7 +96,6 @@ namespace BeeHouseFix
 
             __result = poppy ?? summerSpangle ?? blueJazz ?? tulip;
             return false;
-            
         }
     }
 }
